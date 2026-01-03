@@ -1,0 +1,12 @@
+Generic single-database configuration.
+
+## Generate migration
+alembic revision --autogenerate -m "create users table"
+
+## Apply migration
+alembic upgrade head
+
+# change SQLAlchemy models
+alembic revision --autogenerate -m "add email to users"
+alembic upgrade head
+

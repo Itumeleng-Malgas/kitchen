@@ -1,0 +1,83 @@
+from app.api.deps import get_current_user
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.models.user import User
+from app.core.security import hash_password
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.core.security import verify_password, create_access_token
+from app.models.restaurant import Restaurant
+from app.domain.roles import Role
+
+router = APIRouter(prefix="/auth")
+
+@router.post("/register")
+def register(
+    email: str,
+    password: str,
+    role: Role = Role.OWNER,
+    db: Session = Depends(get_db),
+):
+    # Prevent duplicate users
+    if db.query(User).filter(User.email == email).first():
+        raise HTTPException(status_code=409, detail="Email already registered")
+
+    user = User(
+        email=email,
+        hashed_password=hash_password(password),
+        role=role.value,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "role": user.role,
+    }
+
+@router.post("/login")
+def login(email: str, password: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not verify_password(password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Resolve restaurant context (owner example)
+    restaurant = (
+        db.query(Restaurant)
+        .filter(Restaurant.owner_id == user.id)
+        .first()
+    )
+
+    plan = restaurant.plan if restaurant else "FREE"
+
+    token = create_access_token({
+        "sub": str(user.id),
+        "role": user.role,
+        "plan": plan,
+        "restaurant_id": restaurant.id if restaurant else None,
+    })
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "plan": plan,
+            "restaurant_id": restaurant.id if restaurant else None,
+        },
+    }
+
+@router.get("/me")
+def me(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "role": current_user.role,
+    }
