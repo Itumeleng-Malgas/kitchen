@@ -38,6 +38,7 @@ export const getInitialState = async () => {
 };
 
 const PUBLIC_PATHS = ['/auth/login', '/auth/register'];
+
 export const request: RuntimeConfig['request'] = {
   timeout: 10000,
 
@@ -46,10 +47,13 @@ export const request: RuntimeConfig['request'] = {
       const status = error?.response?.status;
       const url = error?.response?.config?.url;
 
-      // 401 handling: only for protected routes
-      if (status === 401 && !PUBLIC_PATHS.some(p => url?.includes(p))) {
+      const isPublic = PUBLIC_PATHS.some(p =>
+        url ? new URL(url, location.origin).pathname.startsWith(p) : false
+      );
+
+      if (status === 401 && !isPublic && location.pathname !== '/login') {
         localStorage.clear();
-        history.push('/login');
+        window.location.href = '/login';
       }
 
       throw error;
@@ -58,23 +62,25 @@ export const request: RuntimeConfig['request'] = {
 
   requestInterceptors: [
     (url: string, options: any) => {
-      // Do NOT attach token to public endpoints
-      if (PUBLIC_PATHS.some(p => url.includes(p))) {
-        return { url, options };
-      }
+      const isPublic = PUBLIC_PATHS.some(p =>
+        new URL(url, location.origin).pathname.startsWith(p)
+      );
 
-      const token = localStorage.getItem('token');
-      if (token) {
-        options.headers = {
-          ...options.headers,
-          Authorization: `Bearer ${token}`,
-        };
+      if (!isPublic && typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          options.headers = {
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+          };
+        }
       }
 
       return { url, options };
     },
   ],
 };
+
 
 export const layout = ({ initialState }: any) => {
   const location = useLocation();
