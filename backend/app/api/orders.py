@@ -7,7 +7,7 @@ from app.core.permissions import require_role
 from app.infrastructure.event_bus import publish_order_event
 from app.services.subscription_guard import enforce_order_limit
 
-router = APIRouter(prefix="/api/orders", tags=["orders"])
+router = APIRouter(prefix="/orders", tags=["orders"])
 
 @router.post("/")
 def create_order(

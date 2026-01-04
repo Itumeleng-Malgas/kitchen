@@ -6,7 +6,7 @@ from app.domain.order_states import OrderStatus
 from app.services.order_state_machine import transition_order
 from app.core.permissions import require_role
 
-router = APIRouter(prefix="/api/orders/actions", tags=["order-actions"])
+router = APIRouter(prefix="/orders/actions", tags=["order-actions"])
 
 @router.post("/{order_id}/pay")
 def mark_paid(

@@ -4,7 +4,7 @@ from app.db.session import get_db
 from app.models.restaurant import Restaurant
 from app.core.permissions import require_role
 
-router = APIRouter(prefix="/api/restaurants", tags=["restaurants"])
+router = APIRouter(prefix="/restaurants", tags=["restaurants"])
 
 @router.post("/")
 def create_restaurant(
