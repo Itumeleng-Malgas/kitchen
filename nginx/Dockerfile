@@ -16,7 +16,7 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy wait-for-it.sh
-COPY wait-for-it.sh /wait-for-it.sh
+COPY ./wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
 # Start Nginx only after backend is ready
