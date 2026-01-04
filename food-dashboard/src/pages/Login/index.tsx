@@ -1,6 +1,6 @@
-import { useModel, history, request, useLocation, useSearchParams } from '@umijs/max';
+import { useModel, history, request, useSearchParams } from '@umijs/max';
 import { Button, Card, Form, Input, message, Checkbox, Typography, Space } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 
 const { Text, Link } = Typography;
@@ -18,32 +18,33 @@ type LoginResponse = {
   token_type?: string;
 };
 
+type DemoRole = 'owner' | 'manager' | 'kitchen' | 'rider';
+
 export default function Login() {
   const { setState } = useModel('auth');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const [searchParams] = useSearchParams(); // To get query parameters
+  const [searchParams] = useSearchParams();
 
-  // Auto-fill saved credentials on component mount
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    const savedPassword = localStorage.getItem('rememberedPassword');
-    
-    if (savedEmail && savedPassword) {
-      form.setFieldsValue({
-        email: savedEmail,
-        password: savedPassword,
-        remember: true
-      });
-    }
-  }, [form]);
+  const initialValues = {
+    email: localStorage.getItem('rememberedEmail') || '',
+    password: '',
+    remember: !!localStorage.getItem('rememberedEmail'),
+  };
+
+  const safeRedirect = () => {
+    const redirect =
+      searchParams.get('redirect') || searchParams.get('from');
+
+    return redirect && redirect.startsWith('/') ? redirect : '/';
+  };
 
   const onFinish = async (values: LoginPayload) => {
     setLoading(true);
-    
+
     try {
       const { remember, ...loginData } = values;
-      
+
       const res = await request<LoginResponse>('/api/auth/login', {
         method: 'POST',
         data: loginData,
@@ -51,118 +52,92 @@ export default function Login() {
 
       // Store token
       localStorage.setItem('token', res.access_token);
-      
-      // Handle remember me functionality
+
+      if (res.expires_in) {
+        localStorage.setItem(
+          'token_expires_at',
+          String(Date.now() + res.expires_in * 1000),
+        );
+      }
+
+      // Remember email only (never password)
       if (remember) {
         localStorage.setItem('rememberedEmail', values.email);
-        localStorage.setItem('rememberedPassword', values.password);
       } else {
         localStorage.removeItem('rememberedEmail');
-        localStorage.removeItem('rememberedPassword');
       }
-      
-      // Update auth state
-      setState({ 
+
+      // Update global auth state
+      setState({
         user: res.user,
-        token: res.access_token 
+        token: res.access_token,
       });
-      
-      message.success('Login successful!');
-      
-      // Get redirect URL from query params
-      const redirectTo = searchParams.get('redirect') || searchParams.get('from') || '/';
-      history.push(redirectTo);
-      
+
+      message.success('Login successful');
+      form.resetFields(['password']);
+
+      history.push(safeRedirect());
     } catch (error: any) {
-      console.error('Login failed:', error);
-      
-      // Show user-friendly error messages
-      const status = error?.response?.status;
+      console.error('Login error:', error);
+
+      const status =
+        error?.response?.status ?? error?.status;
+
       let errorMessage = 'Login failed. Please try again.';
-      
+
       if (status === 401) {
         errorMessage = 'Invalid email or password';
       } else if (status === 403) {
-        errorMessage = 'Account is disabled. Please contact support';
+        errorMessage = 'Account is disabled';
       } else if (status === 429) {
-        errorMessage = 'Too many attempts. Please try again later';
+        errorMessage = 'Too many attempts. Try again later';
       } else if (status >= 500) {
         errorMessage = 'Server error. Please try again later';
       }
-      
-      message.error(errorMessage);
-      
-      // Clear password field on error
+
+      message.error(error?.data?.message || errorMessage);
       form.setFieldsValue({ password: '' });
-      
     } finally {
       setLoading(false);
     }
   };
 
-  const handleForgotPassword = () => {
-    history.push('/forgot-password');
-  };
-
-  const handleRegisterRedirect = () => {
-    history.push('/register');
-  };
-
-  const handleDemoLogin = async (role: 'owner' | 'manager' | 'kitchen' | 'rider') => {
-    setLoading(true);
-    try {
-      // Demo credentials - consider moving to .env file for production
-      const demoCredentials = {
-        owner: { email: 'owner@demo.com', password: 'demo123' },
-        manager: { email: 'manager@demo.com', password: 'demo123' },
-        kitchen: { email: 'kitchen@demo.com', password: 'demo123' },
-        rider: { email: 'rider@demo.com', password: 'demo123' },
-      };
-      
-      form.setFieldsValue(demoCredentials[role]);
-      await onFinish({ ...demoCredentials[role], remember: false });
-      
-    } catch (error) {
-      message.error('Demo login failed. Please use manual login.');
-      setLoading(false);
-    }
-  };
-
-  // Extract initial values for form
-  const getInitialValues = () => {
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    const savedPassword = localStorage.getItem('rememberedPassword');
-    
-    return {
-      email: savedEmail || '',
-      password: savedPassword || '',
-      remember: !!savedEmail,
+  const handleDemoLogin = async (role: DemoRole) => {
+    const demoCredentials: Record<DemoRole, LoginPayload> = {
+      owner: { email: 'owner@demo.com', password: 'demo123' },
+      manager: { email: 'manager@demo.com', password: 'demo123' },
+      kitchen: { email: 'kitchen@demo.com', password: 'demo123' },
+      rider: { email: 'rider@demo.com', password: 'demo123' },
     };
+
+    const creds = demoCredentials[role];
+    form.setFieldsValue(creds);
+    await onFinish({ ...creds, remember: false });
   };
 
   return (
-    <Card 
-      title="Welcome Back" 
-      style={{ 
-        width: 420, 
+    <Card
+      title="Welcome Back"
+      style={{
+        width: 420,
         margin: '80px auto',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        borderRadius: 8,
       }}
-      headStyle={{ 
-        textAlign: 'center', 
-        fontSize: '24px', 
+      headStyle={{
+        textAlign: 'center',
+        fontSize: 24,
         fontWeight: 'bold',
         borderBottom: 'none',
         padding: '24px 24px 0',
       }}
-      bodyStyle={{ padding: '24px' }}
+      bodyStyle={{ padding: 24 }}
     >
       <Form
         form={form}
-        onFinish={onFinish}
         layout="vertical"
-        initialValues={getInitialValues()}
+        initialValues={initialValues}
+        onFinish={onFinish}
         requiredMark={false}
       >
         <Form.Item
@@ -170,11 +145,11 @@ export default function Login() {
           label="Email Address"
           rules={[
             { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' },
+            { type: 'email', message: 'Invalid email format' },
           ]}
         >
-          <Input 
-            prefix={<MailOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
+          <Input
+            prefix={<MailOutlined />}
             placeholder="Enter your email"
             size="large"
             disabled={loading}
@@ -187,11 +162,11 @@ export default function Login() {
           label="Password"
           rules={[
             { required: true, message: 'Please enter your password' },
-            { min: 6, message: 'Password must be at least 6 characters' },
+            { min: 6, message: 'Minimum 6 characters' },
           ]}
         >
           <Input.Password
-            prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
+            prefix={<LockOutlined />}
             placeholder="Enter your password"
             size="large"
             disabled={loading}
@@ -199,16 +174,16 @@ export default function Login() {
           />
         </Form.Item>
 
-        <Form.Item style={{ marginBottom: 16 }}>
+        <Form.Item>
           <Space style={{ width: '100%', justifyContent: 'space-between' }}>
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox disabled={loading}>Remember me</Checkbox>
             </Form.Item>
-            
-            <Button 
-              type="link" 
-              onClick={handleForgotPassword}
+
+            <Button
+              type="link"
               disabled={loading}
+              onClick={() => history.push('/forgot-password')}
               style={{ padding: 0 }}
             >
               Forgot password?
@@ -217,45 +192,45 @@ export default function Login() {
         </Form.Item>
 
         <Form.Item>
-          <Button 
-            type="primary" 
-            htmlType="submit" 
+          <Button
+            type="primary"
+            htmlType="submit"
             block
             size="large"
             loading={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            Login
           </Button>
         </Form.Item>
 
-        {/* Demo Login Buttons - Optional */}
         {process.env.NODE_ENV === 'development' && (
-          <Form.Item style={{ marginBottom: 8 }}>
-            <Text type="secondary" style={{ textAlign: 'center', display: 'block' }}>
-              Demo Accounts:
+          <Form.Item>
+            <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
+              Demo Accounts
             </Text>
             <Space wrap style={{ justifyContent: 'center', marginTop: 8 }}>
-              {(['owner', 'manager', 'kitchen', 'rider'] as const).map(role => (
-                <Button 
-                  key={role}
-                  size="small"
-                  onClick={() => handleDemoLogin(role)}
-                  disabled={loading}
-                >
-                  {role.charAt(0).toUpperCase() + role.slice(1)}
-                </Button>
-              ))}
+              {(['owner', 'manager', 'kitchen', 'rider'] as DemoRole[]).map(
+                role => (
+                  <Button
+                    key={role}
+                    size="small"
+                    disabled={loading}
+                    onClick={() => handleDemoLogin(role)}
+                  >
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </Button>
+                ),
+              )}
             </Space>
           </Form.Item>
         )}
 
         <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
           <Text type="secondary">
-            Don't have an account?{' '}
-            <Link 
-              onClick={handleRegisterRedirect}
+            Don&apos;t have an account?{' '}
+            <Link
+              onClick={() => history.push('/register')}
               disabled={loading}
-              style={{ fontWeight: 500 }}
             >
               Register now
             </Link>
