@@ -1,5 +1,5 @@
+from app.domain.roles import Role
 from pydantic import BaseModel, EmailStr
-from app.models.user import Role
 
 
 class LoginRequest(BaseModel):
