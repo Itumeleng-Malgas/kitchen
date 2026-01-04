@@ -11,7 +11,7 @@ export default function Register() {
   const { setState } = useModel('auth');
 
   const onFinish = async (values: RegisterPayload) => {
-    const res = await request('/auth/register', {
+    const res = await request('/api/auth/register', {
       method: 'POST',
       data: values, // ✅ JSON body
     });
