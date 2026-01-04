@@ -20,7 +20,7 @@ export default function Register() {
      * Optional: auto-login after register
      * If you prefer redirect to /login instead, remove this block
      */
-    const loginRes = await request('/auth/login', {
+    const loginRes = await request('/api/auth/login', {
       method: 'POST',
       data: {
         email: values.email,

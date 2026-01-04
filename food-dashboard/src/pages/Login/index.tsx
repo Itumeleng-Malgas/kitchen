@@ -5,7 +5,7 @@ export default function Login() {
   const { setState } = useModel('auth');
 
   const onFinish = async (values: any) => {
-    const res = await request('/auth/login', {
+    const res = await request('/api/auth/login', {
       method: 'POST',
       data: values,
     });
