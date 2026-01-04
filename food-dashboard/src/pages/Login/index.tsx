@@ -102,19 +102,6 @@ export default function Login() {
     }
   };
 
-  const handleDemoLogin = async (role: DemoRole) => {
-    const demoCredentials: Record<DemoRole, LoginPayload> = {
-      owner: { email: 'owner@demo.com', password: 'demo123' },
-      manager: { email: 'manager@demo.com', password: 'demo123' },
-      kitchen: { email: 'kitchen@demo.com', password: 'demo123' },
-      rider: { email: 'rider@demo.com', password: 'demo123' },
-    };
-
-    const creds = demoCredentials[role];
-    form.setFieldsValue(creds);
-    await onFinish({ ...creds, remember: false });
-  };
-
   return (
     <Card
       title="Welcome Back"
@@ -202,28 +189,6 @@ export default function Login() {
             Login
           </Button>
         </Form.Item>
-
-        {process.env.NODE_ENV === 'development' && (
-          <Form.Item>
-            <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
-              Demo Accounts
-            </Text>
-            <Space wrap style={{ justifyContent: 'center', marginTop: 8 }}>
-              {(['owner', 'manager', 'kitchen', 'rider'] as DemoRole[]).map(
-                role => (
-                  <Button
-                    key={role}
-                    size="small"
-                    disabled={loading}
-                    onClick={() => handleDemoLogin(role)}
-                  >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </Button>
-                ),
-              )}
-            </Space>
-          </Form.Item>
-        )}
 
         <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
           <Text type="secondary">
