@@ -7,11 +7,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Ensure entrypoint script is executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 # Copy application code
 COPY . .
-
-# Ensure entrypoint script is executable
-RUN chmod +x entrypoint.sh
 
 # Use exec form for ENTRYPOINT with absolute path
 ENTRYPOINT ["./entrypoint.sh"]
