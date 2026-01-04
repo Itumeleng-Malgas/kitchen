@@ -11,6 +11,7 @@ export default function Register() {
   const { setState } = useModel('auth');
 
   const onFinish = async (values: RegisterPayload) => {
+    console.log(values)
     const res = await request('/api/auth/register', {
       method: 'POST',
       data: values,
@@ -55,13 +56,13 @@ export default function Register() {
         <Form.Item
           name="role"
           label="Role"
-          initialValue="OWNER"
+          initialValue="owner"
         >
           <Select>
-            <Select.Option value="OWNER">Owner</Select.Option>
-            <Select.Option value="MANAGER">Manager</Select.Option>
-            <Select.Option value="KITCHEN">Kitchen</Select.Option>
-            <Select.Option value="RIDER">Rider</Select.Option>
+            <Select.Option value="owner">Owner</Select.Option>
+            <Select.Option value="manager">Manager</Select.Option>
+            <Select.Option value="kitchen">Kitchen</Select.Option>
+            <Select.Option value="rider">Rider</Select.Option>
           </Select>
         </Form.Item>
 
