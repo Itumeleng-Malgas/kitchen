@@ -7,7 +7,7 @@ export default function Login() {
   const onFinish = async (values: any) => {
     const res = await request('/auth/login', {
       method: 'POST',
-      params: values,
+      data: values,
     });
 
     localStorage.setItem('token', res.access_token);
