@@ -14,4 +14,4 @@ COPY . .
 RUN chmod +x entrypoint.sh
 
 # Use exec form for ENTRYPOINT with absolute path
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
