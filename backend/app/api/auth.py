@@ -12,7 +12,7 @@ from app.core.security import verify_password, create_access_token
 from app.models.restaurant import Restaurant
 from app.domain.roles import Role
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/api/auth")
 
 @router.post("/register", status_code=201)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
