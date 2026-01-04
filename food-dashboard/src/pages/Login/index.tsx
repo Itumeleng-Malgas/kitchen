@@ -22,7 +22,6 @@ export default function Login() {
   const { setState } = useModel('auth');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const location = useLocation();
   const [searchParams] = useSearchParams(); // To get query parameters
 
   // Auto-fill saved credentials on component mount
