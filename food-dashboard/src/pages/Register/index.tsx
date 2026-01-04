@@ -4,7 +4,7 @@ import { Button, Card, Form, Input, Select } from 'antd';
 type RegisterPayload = {
   email: string;
   password: string;
-  role?: 'OWNER' | 'MANAGER' | 'KITCHEN' | 'RIDER';
+  role?: 'owner' | 'manager' | 'kitchen' | 'rider';
 };
 
 export default function Register() {
@@ -13,7 +13,7 @@ export default function Register() {
   const onFinish = async (values: RegisterPayload) => {
     const res = await request('/api/auth/register', {
       method: 'POST',
-      data: values, // ✅ JSON body
+      data: values,
     });
 
     /**
