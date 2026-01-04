@@ -1,4 +1,4 @@
-import { history, RuntimeConfig } from '@umijs/max';
+import { history, RuntimeConfig, useLocation } from '@umijs/max';
 import { mutate } from 'swr';
 
 import { fetchCurrentUser } from '@/services/auth';
@@ -64,16 +64,32 @@ export const request: RuntimeConfig['request'] = {
   ],
 };
 
-export const layout = () => {
+export const layout = ({ initialState }: any) => {
+  const location = useLocation();
+
   return {
     logo: '/logo.svg',
     title: 'Food Ordering Dashboard',
-    layout: 'mix', // better UX than pure top
+    layout: 'mix',
     contentStyle: { padding: 24 },
     headerHeight: 64,
     siderWidth: 220,
 
     onMenuHeaderClick: () => history.push('/'),
+
+    onPageChange: () => {
+      const token = localStorage.getItem('token');
+       
+      // Not logged in → force login
+      if (!token && location.pathname !== '/login') {
+        history.push('/login');
+      }
+
+      // Logged in → block login page
+      if (token && location.pathname === '/login') {
+        history.push('/');
+      }
+    },
   };
 };
 
