@@ -10,7 +10,7 @@ type RegisterPayload = {
 export default function Register() {
   const { setState } = useModel('auth');
 
-  const onFinish = async (values: RegisterPayload) => {
+  const onFinish = async (values: any) => {
     console.log(values)
     const res = await request('/api/auth/register', {
       method: 'POST',
