@@ -1,5 +1,10 @@
 export default [
   {
+    path: '/register',
+    layout: false,
+    component: './Register',
+  },
+  {
     path: '/login',
     layout: false,
     component: './Login',

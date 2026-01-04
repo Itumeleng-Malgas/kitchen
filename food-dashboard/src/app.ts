@@ -37,21 +37,32 @@ export const getInitialState = async () => {
   }
 };
 
-
+const PUBLIC_PATHS = ['/auth/login', '/auth/register'];
 export const request: RuntimeConfig['request'] = {
   timeout: 10000,
+
   errorConfig: {
     errorHandler(error: any) {
-      // Unauthorized: clear session and redirect
-      if (error?.response?.status === 401) {
+      const status = error?.response?.status;
+      const url = error?.response?.config?.url;
+
+      // 401 handling: only for protected routes
+      if (status === 401 && !PUBLIC_PATHS.some(p => url?.includes(p))) {
         localStorage.clear();
         history.push('/login');
       }
+
       throw error;
     },
   },
+
   requestInterceptors: [
     (url: string, options: any) => {
+      // Do NOT attach token to public endpoints
+      if (PUBLIC_PATHS.some(p => url.includes(p))) {
+        return { url, options };
+      }
+
       const token = localStorage.getItem('token');
       if (token) {
         options.headers = {
@@ -59,6 +70,7 @@ export const request: RuntimeConfig['request'] = {
           Authorization: `Bearer ${token}`,
         };
       }
+
       return { url, options };
     },
   ],

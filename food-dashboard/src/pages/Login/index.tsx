@@ -27,6 +27,14 @@ export default function Login() {
         <Button type="primary" htmlType="submit" block>
           Login
         </Button>
+        
+        <Button
+          type="link"
+          block
+          onClick={() => history.push('/register')}
+        >
+          Do not have an account? Register
+        </Button>
       </Form>
     </Card>
   );
