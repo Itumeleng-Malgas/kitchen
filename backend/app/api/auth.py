@@ -1,4 +1,5 @@
 from app.api.deps import get_current_user
+from backend.app.schemas.auth import LoginRequest, RegisterRequest
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -13,26 +14,20 @@ from app.domain.roles import Role
 
 router = APIRouter(prefix="/auth")
 
-@router.post("/register")
-def register(
-    email: str,
-    password: str,
-    role: Role = Role.OWNER,
-    db: Session = Depends(get_db),
-):
-    # Prevent duplicate users
-    if db.query(User).filter(User.email == email).first():
+@router.post("/register", status_code=201)
+def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=409, detail="Email already registered")
 
     user = User(
-        email=email,
-        hashed_password=hash_password(password),
-        role=role.value,
+        email=payload.email,
+        hashed_password=hash_password(payload.password),
+        role=payload.role.value,
     )
 
     db.add(user)
     db.commit()
-    db.refresh(user)
+    db.refresh(user) #Applies database defaults and triggers
 
     return {
         "id": user.id,
@@ -41,12 +36,11 @@ def register(
     }
 
 @router.post("/login")
-def login(email: str, password: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user or not verify_password(password, user.hashed_password):
+def login(payload: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Resolve restaurant context (owner example)
     restaurant = (
         db.query(Restaurant)
         .filter(Restaurant.owner_id == user.id)
@@ -73,6 +67,7 @@ def login(email: str, password: str, db: Session = Depends(get_db)):
             "restaurant_id": restaurant.id if restaurant else None,
         },
     }
+
 
 @router.get("/me")
 def me(current_user: User = Depends(get_current_user)):
