@@ -2,7 +2,6 @@ import { history, RuntimeConfig, useLocation } from '@umijs/max';
 import { mutate } from 'swr';
 
 import { fetchCurrentUser } from '@/services/auth';
-import { fetchSubscription } from '@/services/subscription';
 
 export const getInitialState = async () => {
   try {
@@ -12,24 +11,19 @@ export const getInitialState = async () => {
     }
 
     // Fetch from your FastAPI backend
-    const [currentUser, subscription] = await Promise.all([
+    const [currentUser] = await Promise.all([
       fetchCurrentUser(),     // GET /auth/me
-      fetchSubscription(),    // GET /subscription/current
     ]);
 
     // Optional: persist in localStorage for UI hints
-    localStorage.setItem('PLAN', subscription.plan);
+    localStorage.setItem('PLAN', currentUser.plan);
     localStorage.setItem('ROLE', currentUser.role);
     localStorage.setItem('RESTAURANT_ID', currentUser.restaurant_id || '');
 
     // Prime SWR cache (instant hydration)
     await mutate('/api/currentUser', currentUser, false);
-    await mutate('/api/subscription', subscription, false);
 
-    return {
-      currentUser,
-      subscription,
-    };
+    return { currentUser };
   } catch (e) {
     localStorage.clear();
     history.push('/login');

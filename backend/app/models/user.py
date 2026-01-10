@@ -1,4 +1,4 @@
-from sqlalchemy import String, Boolean
+from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base_class import Base
 
@@ -11,4 +11,16 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # owner | manager | kitchen | rider
-    role: Mapped[str] = mapped_column(String(50), default="owner")
+    role: Mapped[str] = mapped_column(String(20), default="owner")
+
+    # FREE | PRO | ENTERPRISE
+    plan: Mapped[str] = mapped_column(
+        String(20),
+        default="FREE",
+        nullable=False,
+    )
+
+    restaurant_id: Mapped[int | None] = mapped_column(
+        ForeignKey("restaurants.id"),
+        nullable=True,
+    )

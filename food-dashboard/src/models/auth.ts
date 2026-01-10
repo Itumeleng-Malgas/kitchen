@@ -1,10 +1,15 @@
 import { useState } from 'react';
 
+export type UserRole = 'owner' | 'manager' | 'kitchen' | 'rider';
+export type UserPlan = 'FREE' | 'PRO' | 'ENTERPRISE';
+
 export type AuthUser = {
   id: number;
   email: string;
-  role: 'owner' | 'manager' | 'kitchen' | 'rider';
-  plan: 'FREE' | 'PRO' | 'ENTERPRISE';
+  role: UserRole;
+  is_active: boolean;
+
+  plan: UserPlan;
   restaurant_id?: number;
 };
 

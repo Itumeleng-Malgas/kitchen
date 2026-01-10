@@ -1,5 +1,5 @@
 from app.api.deps import get_current_user
-from app.schemas.auth import LoginRequest, RegisterRequest
+from app.schemas.auth import LoginRequest, RegisterRequest, UserOut
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -70,9 +70,12 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/me")
-def me(current_user: User = Depends(get_current_user)):
+def me(current_user: User = Depends(get_current_user)) -> UserOut:
     return {
         "id": current_user.id,
         "email": current_user.email,
+        "is_active": current_user.is_active,
         "role": current_user.role,
+        "plan": current_user.plan,
+        "restaurant_id": current_user.restaurant_id,
     }
