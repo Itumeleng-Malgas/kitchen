@@ -21,7 +21,7 @@ type LoginResponse = {
 type DemoRole = 'owner' | 'manager' | 'kitchen' | 'rider';
 
 export default function Login() {
-  const { setState } = useModel('auth');
+  const { setUser } = useModel('auth');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [searchParams] = useSearchParams();
@@ -67,11 +67,9 @@ export default function Login() {
         localStorage.removeItem('rememberedEmail');
       }
 
+      console.log(res)
       // Update global auth state
-      setState({
-        user: res.user,
-        token: res.access_token,
-      });
+      setUser(res.user);
 
       message.success('Login successful');
       form.resetFields(['password']);

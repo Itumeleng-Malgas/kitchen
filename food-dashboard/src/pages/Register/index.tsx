@@ -1,3 +1,4 @@
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { history, request, useModel } from '@umijs/max';
 import { Button, Card, Form, Input, Select, message } from 'antd';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ type LoginResponse = {
 };
 
 export default function Register() {
-  const { setState } = useModel('auth');
+  const { setUser } = useModel('auth');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -43,7 +44,7 @@ export default function Register() {
 
       // 3. Store authentication data
       localStorage.setItem('token', loginRes.access_token);
-      setState({ user: loginRes.user });
+      setUser(loginRes.user);
       
       message.success('Registration successful!');
       history.push('/');
@@ -81,6 +82,7 @@ export default function Register() {
           ]}
         >
           <Input 
+            prefix={<MailOutlined />}
             placeholder="Enter your email" 
             autoComplete="email"
             disabled={loading}
@@ -97,6 +99,7 @@ export default function Register() {
           hasFeedback
         >
           <Input.Password 
+            prefix={<LockOutlined />}
             placeholder="Enter password" 
             autoComplete="new-password"
             disabled={loading}
@@ -121,6 +124,7 @@ export default function Register() {
           ]}
         >
           <Input.Password 
+            prefix={<LockOutlined />}
             placeholder="Confirm your password" 
             autoComplete="new-password"
             disabled={loading}
