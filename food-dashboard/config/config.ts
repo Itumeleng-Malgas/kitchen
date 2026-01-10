@@ -2,7 +2,14 @@ import { defineConfig } from '@umijs/max';
 import routes from './routes';
 
 export default defineConfig({
-  antd: {},
+  antd: {
+    theme: {
+      token: {
+        colorPrimary: '#822c6aff',
+        borderRadius: 6,
+      },
+    },
+  },
   access: {},
   model: {},
   initialState: {},

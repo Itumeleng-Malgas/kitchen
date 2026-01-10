@@ -18,8 +18,6 @@ type LoginResponse = {
   token_type?: string;
 };
 
-type DemoRole = 'owner' | 'manager' | 'kitchen' | 'rider';
-
 export default function Login() {
   const { setState } = useModel('auth');
   const [loading, setLoading] = useState(false);
