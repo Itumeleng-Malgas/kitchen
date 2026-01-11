@@ -26,3 +26,6 @@ psql -U app_user -h localhost -p 5432 -d app_db
 DROP DATABASE app_db;
 CREATE DATABASE app_db OWNER app_user;
 
+
+docker compose exec backend alembic revision --autogenerate -m "add plan to users"
+

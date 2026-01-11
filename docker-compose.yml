@@ -1,35 +1,83 @@
 services:
+  # -----------------------
+  # Database
+  # -----------------------
   postgres:
     image: postgres:16
-    restart: unless-stopped
+    container_name: postgres
     env_file:
       - ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
+  # -----------------------
+  # Cache
+  # -----------------------
   redis:
     image: redis:7
-    restart: unless-stopped
+    container_name: redis
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
 
+  # -----------------------
+  # Backend API
+  # -----------------------
   backend:
-    build: ./backend
-    restart: unless-stopped
+    build:
+      context: ./backend
+      args:
+        ENV: ${ENV:-dev}
+    container_name: backend
     env_file:
       - ./backend/.env
-    expose:
-      - "8000"
+    environment:
+      ENV: ${ENV:-dev}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
 
-  nginx:
+  # -----------------------
+  # One-off migration job
+  # -----------------------
+  migrate:
+    build:
+      context: ./backend
+      args:
+        ENV: prod
+    container_name: migrate
+    env_file:
+      - ./backend/.env
+    command: alembic upgrade head
+    depends_on:
+      - postgres
+    restart: "no"
+    profiles:
+      - prod
+
+  # -----------------------
+  # Frontend + Nginx (PROD only)
+  # -----------------------
+  frontend:
     build:
       context: .
       dockerfile: nginx/Dockerfile
-    restart: unless-stopped
+      args:
+        ENV: prod
+    container_name: frontend
     ports:
       - "80:80"
     depends_on:
       - backend
+    profiles:
+      - prod
 
 volumes:
   postgres_data:
