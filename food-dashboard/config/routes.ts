@@ -3,38 +3,49 @@ export default [
     path: '/register',
     layout: false,
     component: './Register',
+    wrappers: ['@/wrappers/RootWrapper'],
   },
   {
     path: '/login',
     layout: false,
     component: './Login',
+    wrappers: ['@/wrappers/RootWrapper'],
   },
   {
-    path: '/',
+    path: '/dashboard',
     name: 'Dashboard',
     component: './Dashboard',
-    //access: 'isOwner',
+    access: 'isOwner',
     icon: 'DashboardOutlined', // Ant Design dashboard icon
+    wrappers: ['@/wrappers/RootWrapper'],
   },
   {
     path: '/orders',
     name: 'Orders',
     component: './Orders',
-    access: 'hasPro',
+    access: 'isOwner',
     icon: 'ShoppingCartOutlined', // Orders / shopping
+    wrappers: ['@/wrappers/RootWrapper'],
   },
   {
     path: '/kitchen',
     name: 'Kitchen',
     component: './Kitchen',
-    //access: 'isKitchen',
     icon: 'NumberOutlined', // Kitchen icon
+    wrappers: ['@/wrappers/RootWrapper', '@/wrappers/planGuard'],
+    requiredPlan: 'PRO',
+    access: 'isKitchen',
   },
   {
-    path: '/rider',
-    name: 'Rider',
-    component: './Rider',
-    //access: 'isRider',
-    icon: 'CarOutlined', // Rider / delivery
-  },
+  path: '/analytics',
+  name: 'Analytics',
+  component: './Analytics',
+  icon: 'RiseOutlined',
+  wrappers: [
+    '@/wrappers/RootWrapper',
+    '@/wrappers/planGuard',
+  ],
+  requiredPlan: 'PRO',
+  access: 'atLeastPro',
+}
 ];

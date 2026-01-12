@@ -19,7 +19,6 @@ type LoginResponse = {
 };
 
 export default function Login() {
-  const { setUser } = useModel('auth');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [searchParams] = useSearchParams();
@@ -28,13 +27,6 @@ export default function Login() {
     email: localStorage.getItem('rememberedEmail') || '',
     password: '',
     remember: !!localStorage.getItem('rememberedEmail'),
-  };
-
-  const safeRedirect = () => {
-    const redirect =
-      searchParams.get('redirect') || searchParams.get('from');
-
-    return redirect && redirect.startsWith('/') ? redirect : '/';
   };
 
   const onFinish = async (values: LoginPayload) => {
@@ -48,16 +40,6 @@ export default function Login() {
         data: loginData,
       });
 
-      // Store token
-      localStorage.setItem('token', res.access_token);
-
-      if (res.expires_in) {
-        localStorage.setItem(
-          'token_expires_at',
-          String(Date.now() + res.expires_in * 1000),
-        );
-      }
-
       // Remember email only (never password)
       if (remember) {
         localStorage.setItem('rememberedEmail', values.email);
@@ -65,14 +47,10 @@ export default function Login() {
         localStorage.removeItem('rememberedEmail');
       }
 
-      console.log(res)
-      // Update global auth state
-      setUser(res.user);
-
       message.success('Login successful');
       form.resetFields(['password']);
 
-      history.push(safeRedirect());
+      history.push('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
 

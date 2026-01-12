@@ -1,3 +1,4 @@
+import { UserRole } from '@/types/auth';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { history, request, useModel } from '@umijs/max';
 import { Button, Card, Form, Input, Select, message } from 'antd';
@@ -7,7 +8,7 @@ type RegisterPayload = {
   email: string;
   password: string;
   confirmPassword?: string; // For client-side validation
-  role?: 'owner' | 'manager' | 'kitchen' | 'rider';
+  role?: UserRole;
 };
 
 type LoginResponse = {
@@ -47,7 +48,7 @@ export default function Register() {
       setUser(loginRes.user);
       
       message.success('Registration successful!');
-      history.push('/');
+      history.push('/dashboard');
       
     } catch (error: any) {
       console.error('Registration failed:', error);

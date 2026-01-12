@@ -4,9 +4,7 @@ import styles from './index.less';
 const HomePage: React.FC = () => {
   return (
     <PageContainer ghost>
-      <div className={styles.container}>
-        Rider
-      </div>
+      <p>Analytics</p>
     </PageContainer>
   );
 };

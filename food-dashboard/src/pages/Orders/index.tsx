@@ -4,11 +4,13 @@ import { useOrders } from '@/services/orders';
 
 
 export default function Orders() {
-  const { currentUser, subscription } = useModel('@@initialState');
-  const enableRealtime = subscription?.plan !== 'FREE';
-  const { orders } = useOrders(currentUser.restaurant_id, enableRealtime);
+  const { initialState } = useModel('@@initialState');
+  const currentUser = initialState?.currentUser;
 
-  if (!orders) return <div>Loading...</div>;
+  const enableRealtime = currentUser?.plan !== 'FREE';
+  //const { orders } = useOrders(currentUser.restaurant_id, enableRealtime);
+
+  //if (!orders) return <div>Loading...</div>;
 
   const handleAction = async (orderId: number, action: string) => {
     await request(`/orders/actions/${orderId}/${action}`, {
@@ -49,5 +51,5 @@ export default function Orders() {
     },
   ];
 
-  return <Table rowKey="id" columns={columns} dataSource={orders} />;
+  return <Table rowKey="id" columns={columns} /*dataSource={orders}*/ />;
 }

@@ -5,24 +5,17 @@ import { fetchCurrentUser } from '@/services/auth';
 
 export const getInitialState = async () => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return {};
-    }
-
     // Fetch from your FastAPI backend
     const [currentUser] = await Promise.all([
       fetchCurrentUser(),     // GET /auth/me
     ]);
 
-    // Optional: persist in localStorage for UI hints
-    localStorage.setItem('PLAN', currentUser.plan);
-    localStorage.setItem('ROLE', currentUser.role);
-    localStorage.setItem('RESTAURANT_ID', currentUser.restaurant_id || '');
+    console.log("getInitialState -> currentUser", currentUser)
 
     // Prime SWR cache (instant hydration)
     await mutate('/api/currentUser', currentUser, false);
-
+    history.push('/dashboard')
+    
     return { currentUser };
   } catch (e) {
     localStorage.clear();
