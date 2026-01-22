@@ -12,6 +12,11 @@ export default [
     wrappers: ['@/wrappers/RootWrapper'],
   },
   {
+    path: '/',
+    exact: true,
+    redirect: '/dashboard',
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     component: './Dashboard',

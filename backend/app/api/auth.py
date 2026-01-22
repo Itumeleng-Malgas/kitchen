@@ -1,12 +1,11 @@
 from app.api.deps import get_current_user
 from app.schemas.auth import LoginRequest, RegisterRequest, UserOut
-from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
 from app.core.security import hash_password
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from app.core.security import verify_password, create_access_token
 from app.models.restaurant import Restaurant
@@ -36,7 +35,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     }
 
 @router.post("/login")
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+def login(payload: LoginRequest, db: Session = Depends(get_db), response: Response = None):
     user = db.query(User).filter(User.email == payload.email).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -56,9 +55,18 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         "restaurant_id": restaurant.id if restaurant else None,
     })
 
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,  # False for local development
+        samesite="lax",  # Use "lax" for better compatibility
+        max_age=24 * 60 * 60,  # 24 hours
+        path="/",  # Important: available to all paths
+        domain=None  # Will use current domain
+    )
+
     return {
-        "access_token": token,
-        "token_type": "bearer",
         "user": {
             "id": user.id,
             "email": user.email,
@@ -68,6 +76,14 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         },
     }
 
+@router.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        httponly=True
+    )
+    return {"message": "Logged out successfully"}
 
 @router.get("/me")
 def me(current_user: User = Depends(get_current_user)) -> UserOut:

@@ -2,6 +2,7 @@ import { defineConfig } from '@umijs/max';
 import routes from './routes';
 
 export default defineConfig({
+  //plugins: ['@umijs/plugin-locale'],
   antd: {
     theme: {
       token: {

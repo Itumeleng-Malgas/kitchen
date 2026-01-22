@@ -1,27 +1,36 @@
-import { useModel, history, request, useSearchParams } from '@umijs/max';
-import { Button, Card, Form, Input, message, Checkbox, Typography, Space } from 'antd';
-import { useState } from 'react';
+import { useModel, history, request } from '@umijs/max';
+import { 
+  Button, 
+  Card, 
+  Form, 
+  Input, 
+  message, 
+  Checkbox, 
+  Typography, 
+  Space 
+} from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 
 const { Text, Link } = Typography;
 
-type LoginPayload = {
+interface LoginPayload {
   email: string;
   password: string;
   remember?: boolean;
-};
+}
 
-type LoginResponse = {
+interface LoginResponse {
   access_token: string;
   user: any;
   expires_in?: number;
   token_type?: string;
-};
+}
 
-export default function Login() {
-  const [loading, setLoading] = useState(false);
+export default function LoginPage() {
+  const { initialState, setInitialState, loading, refresh } = useModel('@@initialState');
   const [form] = Form.useForm();
-  const [searchParams] = useSearchParams();
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const initialValues = {
     email: localStorage.getItem('rememberedEmail') || '',
@@ -29,51 +38,68 @@ export default function Login() {
     remember: !!localStorage.getItem('rememberedEmail'),
   };
 
-  const onFinish = async (values: LoginPayload) => {
-    setLoading(true);
-
+  const handleLogin = async (values: LoginPayload) => {
+    setLoginLoading(true);
+    
     try {
       const { remember, ...loginData } = values;
 
-      const res = await request<LoginResponse>('/api/auth/login', {
+      const response = await request<LoginResponse>('/api/auth/login', {
         method: 'POST',
         data: loginData,
       });
 
-      // Remember email only (never password)
+      // Store email for "remember me" feature
       if (remember) {
         localStorage.setItem('rememberedEmail', values.email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
 
+      if (response.user) {
+        await setInitialState((prevState: any) => ({
+          ...prevState,
+          currentUser: response.user,
+        }));
+
+        await refresh() // Re-execute the getInitialState method 
+      }
+
       message.success('Login successful');
       form.resetFields(['password']);
 
-      history.push('/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
-
-      const status =
-        error?.response?.status ?? error?.status;
-
-      let errorMessage = 'Login failed. Please try again.';
-
-      if (status === 401) {
-        errorMessage = 'Invalid email or password';
-      } else if (status === 403) {
-        errorMessage = 'Account is disabled';
-      } else if (status === 429) {
-        errorMessage = 'Too many attempts. Try again later';
-      } else if (status >= 500) {
-        errorMessage = 'Server error. Please try again later';
-      }
-
-      message.error(error?.data?.message || errorMessage);
-      form.setFieldsValue({ password: '' });
+      handleLoginError(error);
     } finally {
-      setLoading(false);
+      setLoginLoading(false);
+      history.push('/dashboard');
     }
+  };
+
+  const handleLoginError = (error: any) => {
+    console.error('Login failed:', error);
+    
+    const status = error?.response?.status ?? error?.status;
+    let errorMessage = 'Login failed. Please try again.';
+
+    switch (status) {
+      case 401:
+        errorMessage = 'Invalid email or password';
+        break;
+      case 403:
+        errorMessage = 'Account is disabled';
+        break;
+      case 429:
+        errorMessage = 'Too many attempts. Try again later';
+        break;
+      default:
+        if (status >= 500) {
+          errorMessage = 'Server error. Please try again later';
+        }
+    }
+
+    message.error(error?.data?.message || errorMessage);
+    form.setFieldsValue({ password: '' });
   };
 
   return (
@@ -98,7 +124,7 @@ export default function Login() {
         form={form}
         layout="vertical"
         initialValues={initialValues}
-        onFinish={onFinish}
+        onFinish={handleLogin}
         requiredMark={false}
       >
         <Form.Item
@@ -113,7 +139,7 @@ export default function Login() {
             prefix={<MailOutlined />}
             placeholder="Enter your email"
             size="large"
-            disabled={loading}
+            disabled={loginLoading}
             autoComplete="email"
           />
         </Form.Item>
@@ -130,7 +156,7 @@ export default function Login() {
             prefix={<LockOutlined />}
             placeholder="Enter your password"
             size="large"
-            disabled={loading}
+            disabled={loginLoading}
             autoComplete="current-password"
           />
         </Form.Item>
@@ -158,7 +184,7 @@ export default function Login() {
             htmlType="submit"
             block
             size="large"
-            loading={loading}
+            loading={loginLoading}
           >
             Login
           </Button>
