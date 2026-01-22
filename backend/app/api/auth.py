@@ -60,9 +60,9 @@ def login(payload: LoginRequest, db: Session = Depends(get_db), response: Respon
         value=token,
         httponly=True,
         secure=False,  # False for local development
-        samesite="lax",  # Use "lax" for better compatibility
+        samesite="strict",  # Use "lax" for better compatibility
         max_age=24 * 60 * 60,  # 24 hours
-        path="/",  # Important: available to all paths
+        #path="/",  # Important: available to all paths
         domain=None  # Will use current domain
     )
 

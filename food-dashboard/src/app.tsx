@@ -69,17 +69,15 @@ export const request: RuntimeConfig['request'] = {
 
 
 import LogoutButton from '@/components/LogoutButton';
+import DashboardFooter from './components/DashboardFooter';
 
 export const layout: RunTimeLayoutConfig = (initialState) => {
   
   return {
-    title: 'Restaurant Dashboard',
+    title: 'nQue Technologies',
     logo: 'logo.svg',
-    rightContentRender: (props) => {
-      // props contains layout information including collapsed state
-      return <LogoutButton collapsed={props.collapsed} />;
-    },
-    footerRender: () => <div style={{ textAlign: 'left', padding: '10px' }}>© 2026 Food Dashboard</div>,
+    rightContentRender: (props) => <LogoutButton collapsed={props.collapsed} />,
+    footerRender: () => <DashboardFooter/>,
     menuHeaderRender: undefined,
   };
 };

@@ -1,6 +1,7 @@
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { PageContainer } from '@ant-design/pro-components';
 import styles from './index.less';
+import RootContainer from '@/wrappers/RootContainer';
 
 
 
@@ -8,9 +9,9 @@ const HomePage: React.FC = () => {
   const { user } = useCurrentUser();
 
   return (
-    <PageContainer className={styles.container} ghost>
+    <RootContainer>
         Dashboard Hello { user?.email }
-    </PageContainer>
+    </RootContainer>
   );
 };
 

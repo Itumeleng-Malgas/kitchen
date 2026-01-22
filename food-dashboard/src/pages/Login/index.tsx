@@ -63,6 +63,7 @@ export default function LoginPage() {
         }));
 
         await refresh() // Re-execute the getInitialState method 
+        history.push('/dashboard');
       }
 
       message.success('Login successful');
@@ -72,7 +73,6 @@ export default function LoginPage() {
       handleLoginError(error);
     } finally {
       setLoginLoading(false);
-      history.push('/dashboard');
     }
   };
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
 
   return (
     <Card
-      title="Welcome Back"
+      title="nQue Technologies"
       style={{
         width: 420,
         margin: '80px auto',

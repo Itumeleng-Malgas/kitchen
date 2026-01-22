@@ -1,6 +1,7 @@
 import { useModel, request } from '@umijs/max';
 import { Table, Button, Tag } from 'antd';
 import { useOrders } from '@/services/orders';
+import RootContainer from '@/wrappers/RootContainer';
 
 
 export default function Orders() {
@@ -51,5 +52,9 @@ export default function Orders() {
     },
   ];
 
-  return <Table rowKey="id" columns={columns} /*dataSource={orders}*/ />;
+  return (
+    <RootContainer>
+      <Table rowKey="id" columns={columns} /*dataSource={orders}*/ />
+    </RootContainer>
+  );
 }
