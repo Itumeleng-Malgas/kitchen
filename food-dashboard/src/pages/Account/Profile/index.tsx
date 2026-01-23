@@ -46,6 +46,10 @@ const ExamplePage: React.FC = () => {
             closable: false,
           },
           {
+            tab: 'Subscriptions',
+            key: 'subs',
+          },
+          {
             tab: 'Products management',
             key: 'info',
           },
