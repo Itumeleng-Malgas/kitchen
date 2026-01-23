@@ -1,9 +1,8 @@
-import { PageContainer } from '@ant-design/pro-components';
-import styles from './index.less';
+import PageContainer from '@/components/PageContainer';
 
 const HomePage: React.FC = () => {
   return (
-    <PageContainer ghost>
+    <PageContainer>
       <p>Analytics</p>
     </PageContainer>
   );

@@ -15,9 +15,7 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
-  layout: {
-    title: 'Food Dashboard',
-  },
+  layout: {},
   locale: {
     default: 'en-US',
     antd: true,

@@ -1,7 +1,7 @@
 import { useModel, request } from '@umijs/max';
 import { Table, Button, Tag } from 'antd';
 import { useOrders } from '@/services/orders';
-import RootContainer from '@/wrappers/RootContainer';
+import RootContainer from '@/components/PageContainer';
 
 
 export default function Orders() {

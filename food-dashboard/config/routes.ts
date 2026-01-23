@@ -21,8 +21,71 @@ export default [
     name: 'Dashboard',
     component: './Dashboard',
     access: 'isOwner',
-    icon: 'DashboardOutlined', // Ant Design dashboard icon
+    icon: 'DashboardOutlined',
     wrappers: ['@/wrappers/RootWrapper'],
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    access: 'isOwner',
+    icon: 'UserOutlined',
+    routes: [
+      {
+        path: '/account',
+        redirect: '/account/profile',
+        exact: true,
+      },
+      {
+        path: '/account/profile',
+        name: 'Profile',
+        component: './Account/Profile',
+        access: 'isOwner',
+        icon: 'ProfileOutlined',
+      },
+      {
+        path: '/account/settings',
+        name: 'Settings',
+        component: './Account/Settings',
+        access: 'isOwner',
+        icon: 'SettingOutlined',
+      },
+      {
+        path: '/account/analytics',
+        name: 'Analytics',
+        component: './Account/Analytics',
+        icon: 'RiseOutlined',
+        wrappers: [
+          '@/wrappers/planGuard',
+        ],
+        requiredPlan: 'PRO',
+        access: 'isOwner',
+      },
+      // You can also have nested routes within nested routes
+      {
+        path: '/account/security',
+        name: 'Security',
+        icon: 'SafetyOutlined',
+        component: './Account/Security/Password',
+        routes: [
+          {
+            path: '/account/security/password',
+            name: 'Change Password',
+            component: './Account/Security/Password',
+            access: 'isOwner',
+          },
+          {
+            path: '/account/security/two-factor',
+            name: 'Two-Factor Auth',
+            component: './Account/Security/TwoFactor',
+            wrappers: [
+              '@/wrappers/planGuard',
+            ],
+            requiredPlan: 'PRO',
+            access: 'isOwner',
+          },
+        ],
+      },
+    ],
   },
   {
     path: '/orders',
@@ -41,16 +104,4 @@ export default [
     requiredPlan: 'PRO',
     access: 'isKitchen',
   },
-  {
-  path: '/analytics',
-  name: 'Analytics',
-  component: './Analytics',
-  icon: 'RiseOutlined',
-  wrappers: [
-    '@/wrappers/RootWrapper',
-    '@/wrappers/planGuard',
-  ],
-  requiredPlan: 'PRO',
-  access: 'atLeastPro',
-}
 ];

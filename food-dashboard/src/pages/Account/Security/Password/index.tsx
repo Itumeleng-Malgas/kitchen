@@ -1,7 +1,7 @@
 import PageContainer from '@/components/PageContainer';
 import styles from './index.less';
 
-const AccountPage: React.FC = () => {
+const HomePage: React.FC = () => {
   return (
     <PageContainer>
       <div className={styles.container}>
@@ -11,4 +11,4 @@ const AccountPage: React.FC = () => {
   );
 };
 
-export default AccountPage;
+export default HomePage;
