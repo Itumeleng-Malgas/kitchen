@@ -13,9 +13,13 @@
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "@ant-design/pro-components": "^2.4.4",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.4",
     "@umijs/max": "^4.0.7",
+    "ahooks": "^3.9.6",
     "antd": "^5.4.0",
     "reconnecting-websocket": "^4.4.0",
+    "stripe": "^20.2.0",
     "swr": "^2.3.8"
   },
   "devDependencies": {

@@ -96,12 +96,8 @@ export default [
     wrappers: ['@/wrappers/RootWrapper'],
   },
   {
-    path: '/kitchen',
-    name: 'Kitchen',
-    component: './Kitchen',
-    icon: 'NumberOutlined', // Kitchen icon
-    wrappers: ['@/wrappers/RootWrapper', '@/wrappers/planGuard'],
-    requiredPlan: 'PRO',
-    access: 'isKitchen',
+    name: 'Subscription',
+    path: '/subscription',
+    component: './Subscription',
   },
 ];
