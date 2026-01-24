@@ -18,6 +18,7 @@
     "@umijs/max": "^4.0.7",
     "ahooks": "^3.9.6",
     "antd": "^5.4.0",
+    "recharts": "^3.7.0",
     "reconnecting-websocket": "^4.4.0",
     "stripe": "^20.2.0",
     "swr": "^2.3.8"

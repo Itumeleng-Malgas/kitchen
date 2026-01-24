@@ -34,7 +34,6 @@ import { useRequest } from '@umijs/max';
 import SubscriptionPlans from './components/SubscriptionPlans';
 import BillingHistory from './components/BillingHistory';
 import PaymentMethod from './components/PaymentMethod';
-import DeviceManagement from './components/DeviceManagement';
 import useSubscriptionModel from '@/models/subscription';
 
 const { TabPane } = Tabs;
@@ -61,13 +60,8 @@ const SubscriptionPage: React.FC = () => {
     currentPlan,
     plans,
     subscription,
-    devices,
     loading: modelLoading,
     updateSubscription,
-    addDevice,
-    updateDevice,
-    deleteDevice,
-    restartDevice,
     refreshAll,
   } = useSubscriptionModel();
 
@@ -91,18 +85,10 @@ const SubscriptionPage: React.FC = () => {
   // Fetch billing data - using useRequest for API calls
   const { data: billingData, loading: loadingBilling } = useRequest('/api/billing/history');
 
-  // Calculate statistics from real data
-  const deviceStats = {
-    total: devices?.length || 0,
-    online: devices?.filter((d: any) => d.status === 'online').length || 0,
-    offline: devices?.filter((d: any) => d.status === 'offline').length || 0,
-  };
-
   // Get current plan info from subscription or use defaults
   const currentPlanName = currentPlan || 'Professional';
   const currentPlanPrice = subscription?.price || 79;
   const nextBillingDate = subscription?.nextBillingDate || '2024-02-15';
-  const maxDevices = subscription?.maxDevices || 10;
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId);
@@ -130,7 +116,6 @@ const SubscriptionPage: React.FC = () => {
   };
 
   // Calculate usage percentages
-  const deviceUsagePercentage = maxDevices > 0 ? Math.round((deviceStats.total / maxDevices) * 100) : 0;
   const storageUsagePercentage = 45; // This should come from API
   const apiUsagePercentage = 65; // This should come from API
 
@@ -145,7 +130,7 @@ const SubscriptionPage: React.FC = () => {
     <PageContainer
       header={{
         title: 'Subscription Management',
-        subTitle: 'Manage your kiosk subscription and billing',
+        subTitle: 'Manage your subscription and billing',
         breadcrumb: {
           routes: [
             { path: '/', breadcrumbName: 'Home' },
@@ -174,7 +159,6 @@ const SubscriptionPage: React.FC = () => {
         { key: 'overview', tab: 'Overview' },
         { key: 'plans', tab: 'Plans & Pricing' },
         { key: 'billing', tab: 'Billing' },
-        { key: 'devices', tab: 'Devices' },
         { key: 'settings', tab: 'Settings' },
       ]}
       tabActiveKey={activeTab}
@@ -217,16 +201,6 @@ const SubscriptionPage: React.FC = () => {
             <Col xs={24} sm={12} md={6}>
               <ProCard>
                 <Statistic
-                  title="Active Devices"
-                  value={deviceStats.total}
-                  prefix={<TabletOutlined />}
-                  suffix={`/ ${maxDevices}`}
-                />
-              </ProCard>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <ProCard>
-                <Statistic
                   title="Next Billing"
                   value={new Date(nextBillingDate).getDate()}
                   prefix={<CreditCardOutlined />}
@@ -253,7 +227,7 @@ const SubscriptionPage: React.FC = () => {
                   dataIndex: 'status',
                   render: (text) => (
                     <Tag color={text === 'active' ? 'success' : 'warning'}>
-                      {text.toUpperCase()}
+                      {text}
                     </Tag>
                   ),
                 },
@@ -278,13 +252,6 @@ const SubscriptionPage: React.FC = () => {
                   </Button>
                   <Button 
                     block 
-                    icon={<TabletOutlined />}
-                    onClick={() => setActiveTab('devices')}
-                  >
-                    Add New Device
-                  </Button>
-                  <Button 
-                    block 
                     icon={<BarChartOutlined />}
                     onClick={() => window.open('/analytics', '_blank')}
                   >
@@ -304,11 +271,6 @@ const SubscriptionPage: React.FC = () => {
               <ProCard title="Subscription Health">
                 <Space direction="vertical" style={{ width: '100%' }}>
                   <div>
-                    <div style={{ marginBottom: 8 }}>Device Usage ({deviceStats.total}/{maxDevices})</div>
-                    <Progress 
-                      percent={deviceUsagePercentage} 
-                      status={deviceUsagePercentage >= 90 ? "exception" : "active"} 
-                    />
                   </div>
                   <div>
                     <div style={{ marginBottom: 8 }}>Storage Usage</div>
@@ -342,17 +304,6 @@ const SubscriptionPage: React.FC = () => {
         <BillingHistory 
           data={billingData?.data?.list || []} 
           loading={loadingBilling} 
-        />
-      )}
-
-      {activeTab === 'devices' && (
-        <DeviceManagement
-          data={devices}
-          loading={modelLoading}
-          onAddDevice={addDevice}
-          onUpdateDevice={updateDevice}
-          onDeleteDevice={deleteDevice}
-          onRestartDevice={restartDevice}
         />
       )}
 

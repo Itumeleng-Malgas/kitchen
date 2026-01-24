@@ -43,13 +43,6 @@ export default [
         icon: 'ProfileOutlined',
       },
       {
-        path: '/account/settings',
-        name: 'Settings',
-        component: './Account/Settings',
-        access: 'isOwner',
-        icon: 'SettingOutlined',
-      },
-      {
         path: '/account/analytics',
         name: 'Analytics',
         component: './Account/Analytics',
@@ -57,33 +50,14 @@ export default [
         wrappers: [
           '@/wrappers/planGuard',
         ],
-        requiredPlan: 'PRO',
+        //requiredPlan: 'PRO',
         access: 'isOwner',
       },
-      // You can also have nested routes within nested routes
       {
         path: '/account/security',
         name: 'Security',
         icon: 'SafetyOutlined',
-        component: './Account/Security/Password',
-        routes: [
-          {
-            path: '/account/security/password',
-            name: 'Change Password',
-            component: './Account/Security/Password',
-            access: 'isOwner',
-          },
-          {
-            path: '/account/security/two-factor',
-            name: 'Two-Factor Auth',
-            component: './Account/Security/TwoFactor',
-            wrappers: [
-              '@/wrappers/planGuard',
-            ],
-            requiredPlan: 'PRO',
-            access: 'isOwner',
-          },
-        ],
+        component: './Account/Security'
       },
     ],
   },
@@ -96,7 +70,6 @@ export default [
     wrappers: ['@/wrappers/RootWrapper'],
   },
   {
-    name: 'Subscription',
     path: '/subscription',
     component: './Subscription',
   },

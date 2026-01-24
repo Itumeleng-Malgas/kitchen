@@ -116,46 +116,6 @@ declare namespace API {
     };
   }
 
-  // Device Types
-  interface Device {
-    id: string;
-    name: string;
-    type: 'tablet' | 'kiosk' | 'pos' | 'display';
-    status: 'online' | 'offline' | 'maintenance' | 'updating';
-    location: string;
-    ipAddress: string;
-    macAddress: string;
-    softwareVersion: string;
-    lastActive: string;
-    uptime: number;
-    storage: {
-      used: number;
-      total: number;
-      usagePercentage: number;
-    };
-    cpu: {
-      usage: number;
-      temperature?: number;
-    };
-    memory: {
-      used: number;
-      total: number;
-      usagePercentage: number;
-    };
-    network: {
-      ssid?: string;
-      signalStrength?: number;
-      downloadSpeed?: number;
-      uploadSpeed?: number;
-    };
-    settings: {
-      autoRestart: boolean;
-      autoUpdate: boolean;
-      screenTimeout: number;
-      volume: number;
-    };
-  }
-
   // Business Types
   interface Business {
     id: string;
