@@ -76,7 +76,7 @@ export const layout: RunTimeLayoutConfig = (initialState) => {
   return {
     title: 'nQue Technologies',
     logo: 'logo.svg',
-    layout: 'side',
+    layout: 'top',
     rightContentRender: (props) => <LogoutButton collapsed={props.collapsed} />,
     footerRender: () => <DashboardFooter/>,
     menuHeaderRender: undefined,
