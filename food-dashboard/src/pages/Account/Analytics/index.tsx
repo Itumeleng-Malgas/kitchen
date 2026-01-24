@@ -141,7 +141,7 @@ const AnalyticsDashboard: React.FC = () => {
     moment(),
   ]);
   const [timeRange, setTimeRange] = useState('30days');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('orders');
 
   // Mock data for demonstration
   const mockMetrics: AnalyticsMetric[] = [
