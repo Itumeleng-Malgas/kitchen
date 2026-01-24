@@ -14,11 +14,11 @@ export default [
   {
     path: '/',
     exact: true,
-    redirect: '/dashboard',
+    redirect: '/orders',
   },
   {
     path: '/dashboard',
-    name: 'Dashboard',
+    //name: 'Dashboard',
     component: './Dashboard',
     access: 'isOwner',
     icon: 'DashboardOutlined',
@@ -63,7 +63,7 @@ export default [
   },
   {
     path: '/orders',
-    name: 'Orders',
+    name: 'Orders Management',
     component: './Orders',
     access: 'isOwner',
     icon: 'ShoppingCartOutlined', // Orders / shopping

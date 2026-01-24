@@ -63,7 +63,7 @@ export default function LoginPage() {
         }));
 
         await refresh() // Re-execute the getInitialState method 
-        history.push('/dashboard');
+        history.push('/orders');
       }
 
       message.success('Login successful');

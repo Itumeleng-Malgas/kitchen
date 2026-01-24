@@ -384,12 +384,6 @@ const OrdersPage: React.FC = () => {
       header={{
         title: 'Order Management',
         subTitle: 'Manage and track all WhatsApp orders',
-        breadcrumb: {
-          routes: [
-            { path: '/', breadcrumbName: 'Home' },
-            { path: '/orders', breadcrumbName: 'Orders' },
-          ],
-        },
         extra: [
           <Button 
             key="create" 

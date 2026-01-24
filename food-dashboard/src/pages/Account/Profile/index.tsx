@@ -49,8 +49,9 @@ import {
   Progress,
   Card,
   List,
+  MenuProps,
 } from 'antd';
-import { useRequest } from '@umijs/max';
+import { useNavigate, useRequest } from '@umijs/max';
 import moment from 'moment';
 
 const { Title, Text, Paragraph } = Typography;
@@ -113,6 +114,8 @@ const BusinessProfilePage: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const navigate = useNavigate();
 
   // Fetch business data
   const { data: businessData, loading: loadingBusiness, run: refreshBusiness } = useRequest<API.Response<BusinessInfo>>(
@@ -234,20 +237,16 @@ const BusinessProfilePage: React.FC = () => {
     // Open user modal
   };
 
-  const moreMenuItems = [
+  const handleMoreMenuClick: MenuProps['onClick'] = (e) => {
+    message.info('Click on menu item.');
+    console.log('click', e);
+  };
+
+  const moreMenuItems: MenuProps = {
+  items: [
     {
-      key: 'export',
-      label: 'Export Business Data',
-      icon: <DownloadOutlined />,
-    },
-    {
-      key: 'share',
-      label: 'Share Profile',
-      icon: <ShareAltOutlined />,
-    },
-    {
-      key: 'duplicate',
-      label: 'Duplicate Business',
+      key: 'subscription',
+      label: 'Manage Subscription',
       icon: <PlusOutlined />,
     },
     {
@@ -260,10 +259,26 @@ const BusinessProfilePage: React.FC = () => {
     },
     {
       key: 'settings',
-      label: 'Advanced Settings',
+      label: 'Security Settings',
       icon: <SettingOutlined />,
     },
-  ];
+  ],
+  onClick: ({ key }) => {
+    console.log('Clicked key:', key);
+    // Handle export logic based on key
+    switch (key) {
+      case 'subscription':
+        navigate('/subscription');
+        break;
+      case 'analytics':
+        navigate('/account/analytics');
+        break;
+      case 'settings':
+        navigate('/account/security');
+        break;
+    }
+  },
+};
 
   return (
     <PageContainer
@@ -290,7 +305,7 @@ const BusinessProfilePage: React.FC = () => {
           </Button>,
           <Dropdown
             key="more"
-            menu={{ items: moreMenuItems }}
+            menu={moreMenuItems}
             placement="bottomRight"
           >
             <Button icon={<EllipsisOutlined />} />

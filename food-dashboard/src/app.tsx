@@ -14,7 +14,7 @@ export const getInitialState = async () => {
 
     // Prime SWR cache (instant hydration)
     await mutate('/api/currentUser', currentUser, false);
-    history.push('/dashboard')
+    history.push('/orders')
     
     return { currentUser };
   } catch (e) {
